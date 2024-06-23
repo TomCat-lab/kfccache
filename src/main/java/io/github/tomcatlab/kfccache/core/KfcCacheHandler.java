@@ -39,9 +39,15 @@ public class KfcCacheHandler extends SimpleChannelInboundHandler<String> {
         String cmd = args[2].toUpperCase();
         Command command = Commands.get(cmd);
         if (command!=null){
-            Reply<?> reply = command.execute(CACHE, args);
-            System.out.println("CMD[" + cmd + "] => " + reply.type + " => " + reply.value);
-            replyContext(ctx, reply);
+            try {
+                Reply<?> reply = command.execute(CACHE, args);
+                System.out.println("CMD[" + cmd + "] => " + reply.type + " => " + reply.value);
+                replyContext(ctx, reply);
+            }catch (Exception e){
+                Reply<String> reply = Reply.error("ERR  command '" + cmd + "'" + "msg: " + e.getMessage());
+                replyContext(ctx, reply);
+            }
+
         }else  {
             Reply<?> reply = Reply.error("ERR unsupported command '" + cmd + "'");
             replyContext(ctx, reply);
